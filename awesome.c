@@ -322,6 +322,10 @@ main(int argc, char **argv)
         { NULL,      0, NULL, 0 }
     };
 
+    /* Disable buffering of stdout/stderr. */
+    setbuf(stdout, NULL);
+    setbuf(stderr, NULL);
+
     /* clear the globalconf structure */
     p_clear(&globalconf, 1);
     globalconf.keygrabber = LUA_REFNIL;
