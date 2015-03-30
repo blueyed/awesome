@@ -797,9 +797,10 @@ function prompt.run(args, textbox, exe_callback, completion_callback,
         else
             if completion_callback then
                 if key == "Tab" or key == "ISO_Left_Tab" then
-                    if key == "ISO_Left_Tab" then
+                    if key == "ISO_Left_Tab" then  -- Shift-Tab
                         if ncomp == 1 then return end
                         if ncomp == 2 then
+                            -- Restore previous command.
                             command = command_before_comp
                             textbox:set_font(font)
                             textbox:set_markup(prompt_text_with_cursor{
@@ -823,7 +824,8 @@ function prompt.run(args, textbox, exe_callback, completion_callback,
                         exec(exe_callback)
                         return
                     end
-                else
+                elseif key:wlen() == 1 then
+                    -- No control char, i.e. Shift_L or Shift_R.
                     ncomp = 1
                 end
             end
