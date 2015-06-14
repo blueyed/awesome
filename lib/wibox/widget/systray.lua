@@ -80,7 +80,7 @@ local function new(revers)
     end
 
     capi.awesome.connect_signal("systray::update", function()
-        ret:emit_signal("widget::updated")
+        ret:emit_signal("widget::layout_changed")
     end)
 
     return ret
