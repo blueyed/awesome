@@ -15,8 +15,6 @@ local base = require("wibox.widget.base")
 local align = {}
 
 --- Calculate the layout of an align layout.
--- @param wibox The wibox that this widget is drawn to.
--- @param cr The cairo context to use.
 -- @param width The available width.
 -- @param height The available height.
 function align:layout(width, height)
