@@ -5,8 +5,7 @@
 -- @classmod wibox.layout.flex
 ---------------------------------------------------------------------------
 
-local base = require("wibox.layout.base")
-local widget_base = require("wibox.widget.base")
+local base = require("wibox.widget.base")
 local table = table
 local pairs = pairs
 local floor = math.floor
@@ -60,7 +59,7 @@ function flex:draw(wibox, cr, width, height)
 end
 
 function flex:add(widget)
-    widget_base.check_widget(widget)
+    base.check_widget(widget)
     table.insert(self.widgets, widget)
     widget:weak_connect_signal("widget::updated", self._emit_updated)
     self._emit_updated()
@@ -119,7 +118,7 @@ function flex:reset()
 end
 
 local function get_layout(dir)
-    local ret = widget_base.make_widget()
+    local ret = base.make_widget()
 
     for k, v in pairs(flex) do
         if type(v) == "function" then

@@ -8,12 +8,33 @@
 local debug = require("gears.debug")
 local object = require("gears.object")
 local cache = require("gears.cache")
+local matrix = require("gears.matrix")
+local Matrix = require("lgi").cairo.Matrix
 local setmetatable = setmetatable
 local pairs = pairs
 local type = type
 local table = table
 
 local base = {}
+
+--- Figure out the geometry in device coordinate space. This gives only tight
+-- bounds if no rotations by non-multiples of 90° are used.
+function base.rect_to_device_geometry(cr, x, y, width, height)
+    return matrix.transform_rectangle(cr.matrix, x, y, width, height)
+end
+
+--- Fit a widget for the given available width and height
+-- @param widget The widget to fit (this uses widget:fit(width, height)).
+-- @param width The available width for the widget
+-- @param height The available height for the widget
+-- @return The width and height that the widget wants to use
+function base.fit_widget(widget, width, height)
+    -- Sanitize the input. This also filters out e.g. NaN.
+    local width = math.max(0, width)
+    local height = math.max(0, height)
+
+    return widget._fit_geometry_cache:get(width, height)
+end
 
 --- Set/get a widget's buttons
 function base:buttons(_buttons)

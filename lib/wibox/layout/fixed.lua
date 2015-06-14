@@ -5,8 +5,7 @@
 -- @classmod wibox.layout.fixed
 ---------------------------------------------------------------------------
 
-local base = require("wibox.layout.base")
-local widget_base = require("wibox.widget.base")
+local base = require("wibox.widget.base")
 local table = table
 local pairs = pairs
 
@@ -52,7 +51,7 @@ end
 
 --- Add a widget to the given fixed layout
 function fixed:add(widget)
-    widget_base.check_widget(widget)
+    base.check_widget(widget)
     table.insert(self.widgets, widget)
     widget:weak_connect_signal("widget::updated", self._emit_updated)
     self._emit_updated()
@@ -116,7 +115,7 @@ function fixed:fill_space(val)
 end
 
 local function get_layout(dir)
-    local ret = widget_base.make_widget()
+    local ret = base.make_widget()
 
     for k, v in pairs(fixed) do
         if type(v) == "function" then

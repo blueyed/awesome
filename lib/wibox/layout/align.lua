@@ -10,8 +10,7 @@ local table = table
 local pairs = pairs
 local type = type
 local floor = math.floor
-local base = require("wibox.layout.base")
-local widget_base = require("wibox.widget.base")
+local base = require("wibox.widget.base")
 
 local align = {}
 
@@ -217,7 +216,7 @@ function align:reset()
 end
 
 local function get_layout(dir)
-    local ret = widget_base.make_widget()
+    local ret = base.make_widget()
     ret.dir = dir
     ret._emit_updated = function()
         ret:emit_signal("widget::updated")
