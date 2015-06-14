@@ -5,8 +5,7 @@
 -- @classmod wibox.widget.systray
 ---------------------------------------------------------------------------
 
-local wbase = require("wibox.widget.base")
-local lbase = require("wibox.layout.base")
+local base = require("wibox.widget.base")
 local beautiful = require("beautiful")
 local capi = { awesome = awesome }
 local setmetatable = setmetatable
@@ -20,7 +19,7 @@ local base_size = nil
 local reverse = false
 
 function systray:draw(wibox, cr, width, height)
-    local x, y, _, _ = lbase.rect_to_device_geometry(cr, 0, 0, width, height)
+    local x, y, _, _ = base.rect_to_device_geometry(cr, 0, 0, width, height)
     local num_entries = capi.awesome.systray()
     local bg = beautiful.bg_systray or beautiful.bg_normal or "#000000"
     local spacing = beautiful.systray_icon_spacing or 0
@@ -67,7 +66,7 @@ function systray:fit(width, height)
 end
 
 local function new(revers)
-    local ret = wbase.make_widget()
+    local ret = base.make_widget()
 
     ret.fit = systray.fit
     ret.draw = systray.draw

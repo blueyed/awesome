@@ -33,7 +33,8 @@ function base.fit_widget(widget, width, height)
     local width = math.max(0, width)
     local height = math.max(0, height)
 
-    return widget._fit_geometry_cache:get(width, height)
+    local w, h = widget._fit_geometry_cache:get(width, height)
+    return w, h
 end
 
 --- Set/get a widget's buttons
@@ -153,9 +154,9 @@ function base.make_widget(proxy)
     end)
 
     if proxy then
-        ret.fit = function(_, ...) return proxy._fit_geometry_cache:get(proxy, ...) end
+        ret.fit = function(_, ...) return proxy._fit_geometry_cache:get(...) end
         ret.layout = function(_, width, height)
-            return { base.place_widget(proxy, Matrix.create_identity(), width, height) }
+            return { base.place_widget_at(proxy, 0, 0, width, height) }
         end
         proxy:connect_signal("widget::layout_changed", function()
             ret:emit_signal("widget::layout_changed")

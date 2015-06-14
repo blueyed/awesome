@@ -7,7 +7,7 @@
 
 local base = require("wibox.widget.base")
 local color = require("gears.color")
-local layout_base = require("wibox.layout.base")
+local base = require("wibox.widget.base")
 local surface = require("gears.surface")
 local cairo = require("lgi").cairo
 local setmetatable = setmetatable
@@ -53,7 +53,7 @@ function background:fit(width, height)
         return 0, 0
     end
 
-    return self.widget:fit(width, height)
+    return base.fit_widget(self.widget, width, height)
 end
 
 --- Set the widget that is drawn on top of the background

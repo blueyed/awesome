@@ -131,12 +131,12 @@ end
 function hierarchy:get_children_at(x, y)
     local result = {}
     for _, w in ipairs(self._children) do
-        local ext = w._size
+        local ext = w._draw_extents
         local m_inverse = matrix.copy(w._matrix)
         m_inverse:invert()
         local _x, _y = m_inverse:transform_point(x, y)
-        if _x >= 0 and _x <= ext.width and
-            _y >= 0 and _y <= ext.height then
+        if _x >= ext.x and _x <= ext.x + ext.width and
+            _y >= ext.y and _y <= ext.y + ext.height then
             table.insert(result, w)
         end
     end
