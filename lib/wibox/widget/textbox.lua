@@ -64,7 +64,8 @@ function textbox:set_markup(text)
 
     self._layout.text = parsed
     self._layout.attributes = attr
-    self:emit_signal("widget::updated")
+    self:emit_signal("widget::redraw_needed")
+    self:emit_signal("widget::layout_changed")
 end
 
 --- Set a textbox' text.
@@ -72,7 +73,8 @@ end
 function textbox:set_text(text)
     self._layout.text = text
     self._layout.attributes = nil
-    self:emit_signal("widget::updated")
+    self:emit_signal("widget::redraw_needed")
+    self:emit_signal("widget::layout_changed")
 end
 
 --- Set a textbox' ellipsize mode.
@@ -81,7 +83,8 @@ function textbox:set_ellipsize(mode)
     local allowed = { none = "NONE", start = "START", middle = "MIDDLE", ["end"] = "END" }
     if allowed[mode] then
         self._layout:set_ellipsize(allowed[mode])
-        self:emit_signal("widget::updated")
+        self:emit_signal("widget::redraw_needed")
+        self:emit_signal("widget::layout_changed")
     end
 end
 
@@ -91,7 +94,8 @@ function textbox:set_wrap(mode)
     local allowed = { word = "WORD", char = "CHAR", word_char = "WORD_CHAR" }
     if allowed[mode] then
         self._layout:set_wrap(allowed[mode])
-        self:emit_signal("widget::updated")
+        self:emit_signal("widget::redraw_needed")
+        self:emit_signal("widget::layout_changed")
     end
 end
 
@@ -101,7 +105,8 @@ function textbox:set_valign(mode)
     local allowed = { top = true, center = true, bottom = true }
     if allowed[mode] then
         self._valign = mode
-        self:emit_signal("widget::updated")
+        self:emit_signal("widget::redraw_needed")
+        self:emit_signal("widget::layout_changed")
     end
 end
 
@@ -111,7 +116,8 @@ function textbox:set_align(mode)
     local allowed = { left = "LEFT", center = "CENTER", right = "RIGHT" }
     if allowed[mode] then
         self._layout:set_alignment(allowed[mode])
-        self:emit_signal("widget::updated")
+        self:emit_signal("widget::redraw_needed")
+        self:emit_signal("widget::layout_changed")
     end
 end
 
@@ -119,6 +125,8 @@ end
 -- @param font The font description as string
 function textbox:set_font(font)
     self._layout:set_font_description(beautiful.get_font(font))
+    self:emit_signal("widget::redraw_needed")
+    self:emit_signal("widget::layout_changed")
 end
 
 -- Returns a new textbox
