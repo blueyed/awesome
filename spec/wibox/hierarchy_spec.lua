@@ -52,6 +52,16 @@ describe("wibox.hierarchy", function()
                     instance:get_matrix_to_device()))
         end)
 
+        it("get_matrix_from_parent", function()
+            assert.is_true(matrix.equals(cairo.Matrix.create_identity(),
+                    instance:get_matrix_from_parent()))
+        end)
+
+        it("get_matrix_from_device", function()
+            assert.is_true(matrix.equals(cairo.Matrix.create_identity(),
+                    instance:get_matrix_from_device()))
+        end)
+
         it("get_draw_extents", function()
             assert.is.same({ instance:get_draw_extents() }, { 0, 0, 10, 20 })
         end)
@@ -62,10 +72,6 @@ describe("wibox.hierarchy", function()
 
         it("get_children", function()
             assert.is.same(instance:get_children(), {})
-        end)
-
-        it("get_children_at", function()
-            assert.is.same(instance:get_children_at(1, 2), {})
         end)
     end)
 
@@ -168,6 +174,18 @@ describe("wibox.hierarchy", function()
             assert.is_true(matrix.equals(hierarchy_parent:get_matrix_to_device(), cairo.Matrix.create_identity()))
         end)
 
+        it("get_matrix_from_parent", function()
+            assert.is_true(matrix.equals(hierarchy_child:get_matrix_from_parent(), cairo.Matrix.create_translate(0, -5)))
+            assert.is_true(matrix.equals(hierarchy_intermediate:get_matrix_from_parent(), cairo.Matrix.create_translate(-4, 0)))
+            assert.is_true(matrix.equals(hierarchy_parent:get_matrix_from_parent(), cairo.Matrix.create_identity()))
+        end)
+
+        it("get_matrix_from_device", function()
+            assert.is_true(matrix.equals(hierarchy_child:get_matrix_from_device(), cairo.Matrix.create_translate(-4, -5)))
+            assert.is_true(matrix.equals(hierarchy_intermediate:get_matrix_from_device(), cairo.Matrix.create_translate(-4, 0)))
+            assert.is_true(matrix.equals(hierarchy_parent:get_matrix_from_device(), cairo.Matrix.create_identity()))
+        end)
+
         it("get_draw_extents", function()
             assert.is.same({ hierarchy_child:get_draw_extents() }, { 0, 0, 10, 20 })
             assert.is.same({ hierarchy_intermediate:get_draw_extents() }, { 0, 0, 10, 25 })
@@ -178,23 +196,6 @@ describe("wibox.hierarchy", function()
             assert.is.same({ hierarchy_child:get_size() }, { 10, 20 })
             assert.is.same({ hierarchy_intermediate:get_size() }, { 5, 2 })
             assert.is.same({ hierarchy_parent:get_size() }, { 15, 16 })
-        end)
-
-        describe("get_children_at", function()
-            it("child is found", function()
-                assert.is.same(hierarchy_intermediate:get_children_at(0, 5), { hierarchy_child })
-                assert.is.same(hierarchy_intermediate:get_children_at(10, 5), { hierarchy_child })
-                assert.is.same(hierarchy_intermediate:get_children_at(10, 25), { hierarchy_child })
-                assert.is.same(hierarchy_intermediate:get_children_at(0, 25), { hierarchy_child })
-                assert.is.same(hierarchy_intermediate:get_children_at(5, 15), { hierarchy_child })
-            end)
-
-            it("empty space is handled correctly", function()
-                assert.is.same(hierarchy_intermediate:get_children_at(-0.5, 15), {})
-                assert.is.same(hierarchy_intermediate:get_children_at(10.5, 15), {})
-                assert.is.same(hierarchy_intermediate:get_children_at(5, 4.5), {})
-                assert.is.same(hierarchy_intermediate:get_children_at(5, 25.5), {})
-            end)
         end)
     end)
 

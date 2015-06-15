@@ -78,16 +78,16 @@ function hierarchy:get_widget()
     return self._widget
 end
 
---- Get a cairo matrix that transforms from the parent's coordinate space into
+--- Get a cairo matrix that transforms to the parent's coordinate space from
 -- this hierarchy's coordinate system.
 -- @return A cairo matrix describing the transformation.
 function hierarchy:get_matrix_to_parent()
     return matrix.copy(self._matrix)
 end
 
---- Get a cairo matrix that transforms from the base of this hierarchy's
+--- Get a cairo matrix that transforms to the base of this hierarchy's
 -- coordinate system (aka the coordinate system of the device that this
--- hierarchy is applied upon) into this hierarchy's coordinate system.
+-- hierarchy is applied upon) from this hierarchy's coordinate system.
 -- @return A cairo matrix describing the transformation.
 function hierarchy:get_matrix_to_device()
     if not self._matrix_to_device then
@@ -100,6 +100,25 @@ function hierarchy:get_matrix_to_device()
         self._matrix_to_device = m
     end
     return matrix.copy(self._matrix_to_device)
+end
+
+--- Get a cairo matrix that transforms from the parent's coordinate space into
+-- this hierarchy's coordinate system.
+-- @return A cairo matrix describing the transformation.
+function hierarchy:get_matrix_from_parent()
+    local m = self:get_matrix_to_parent()
+    m:invert()
+    return m
+end
+
+--- Get a cairo matrix that transforms from the base of this hierarchy's
+-- coordinate system (aka the coordinate system of the device that this
+-- hierarchy is applied upon) into this hierarchy's coordinate system.
+-- @return A cairo matrix describing the transformation.
+function hierarchy:get_matrix_from_device()
+    local m = self:get_matrix_to_device()
+    m:invert()
+    return m
 end
 
 --- Get the extents that this hierarchy possibly draws to (in the current coordinate space).
@@ -122,25 +141,6 @@ end
 -- @return List of all children hierarchies.
 function hierarchy:get_children()
     return self._children
-end
-
---- Get a list of children containing the given coordinates.
--- @param x X coordinate for the child.
--- @param y Y coordinate for the child.
--- @return A list of widget hierarchies.
-function hierarchy:get_children_at(x, y)
-    local result = {}
-    for _, w in ipairs(self._children) do
-        local ext = w._draw_extents
-        local m_inverse = matrix.copy(w._matrix)
-        m_inverse:invert()
-        local _x, _y = m_inverse:transform_point(x, y)
-        if _x >= ext.x and _x <= ext.x + ext.width and
-            _y >= ext.y and _y <= ext.y + ext.height then
-            table.insert(result, w)
-        end
-    end
-    return result
 end
 
 --- Compare two widget hierarchies and compute a cairo Region that contains all
