@@ -38,34 +38,32 @@ draw_hierarchy = function(arg, cr, hierarchy, dirty_area)
 
     -- Are we outside of the dirty area?
     local rect = cairo.RectangleInt{ x = x, y = y, width = width, height = height }
-    if dirty_area:contains_rectangle(rect) == "OUT" then
-        return
-    end
-
-    local call = function(func)
-        if func then
-            local success, msg = pcall(func, widget, arg, cr, hierarchy:get_size())
-            if not success then
-                print("Error while drawing widget: " .. msg)
+    if dirty_area:contains_rectangle(rect) ~= "OUT" then
+        local call = function(func)
+            if func then
+                local success, msg = pcall(func, widget, arg, cr, hierarchy:get_size())
+                if not success then
+                    print("Error while drawing widget: " .. msg)
+                end
             end
         end
-    end
 
-    -- Draw the widget
-    cr:save()
-    cr:rectangle(0, 0, hierarchy:get_size())
-    cr:clip()
-    call(widget.draw)
-    cr:restore()
+        -- Draw the widget
+        cr:save()
+        cr:rectangle(0, 0, hierarchy:get_size())
+        cr:clip()
+        call(widget.draw)
+        cr:restore()
 
-    -- Draw its children
-    cr:rectangle(hierarchy:get_draw_extents())
-    cr:clip()
-    call(widget.before_draw_children)
-    for _, wi in ipairs(hierarchy:get_children()) do
-        draw_hierarchy(arg, cr, wi, dirty_area)
+        -- Draw its children
+        cr:rectangle(hierarchy:get_draw_extents())
+        cr:clip()
+        call(widget.before_draw_children)
+        for _, wi in ipairs(hierarchy:get_children()) do
+            draw_hierarchy(arg, cr, wi, dirty_area)
+        end
+        call(widget.after_draw_children)
     end
-    call(widget.after_draw_children)
 
     cr:restore()
 end
@@ -85,7 +83,8 @@ local function do_redraw(self)
         self._widget_hierarchy = self.widget and
             hierarchy.new(self.widget, width, height, self._redraw_callback, self._layout_callback)
 
-        if old_hierarchy == nil or self._widget_hierarchy == nil then
+        if old_hierarchy == nil or self._widget_hierarchy == nil or self._need_complete_repaint then
+            self._need_complete_repaint = false
             self._dirty_area:union_rectangle(cairo.RectangleInt({
                 x = 0, y = 0, width = width, height = height
             }))
@@ -109,6 +108,8 @@ local function do_redraw(self)
     -- XXX: Make redraws visible
     cr:paint()
     self.drawable:refresh()
+    local unused = mouse.object_under_pointer()
+    os.execute("sleep 0.5")
 
     -- Draw the background
     cr:save()
@@ -145,20 +146,32 @@ local function do_redraw(self)
 end
 
 local function find_widgets(drawable, result, hierarchy, x, y)
-    local width, height = hierarchy:get_size()
-    local m = hierarchy:get_matrix_to_parent()
-    m:invert()
+    local m = hierarchy:get_matrix_from_device()
+
+    -- Is (x,y) inside of this hierarchy or any child (aka the draw extents)
     local x1, y1 = m:transform_point(x, y)
+    local x2, y2, width, height = hierarchy:get_draw_extents()
+    if x1 < x2 or x1 >= x2 + width then
+        return
+    end
+    if y1 < y2 or y1 >= y2 + height then
+        return
+    end
+
+    -- Is (x,y) inside of this widget?
+    local width, height = hierarchy:get_size()
     if x1 >= 0 and y1 >= 0 and x1 <= width and y1 <= height then
-        local x, y, w, h = matrix.transform_rectangle(hierarchy:get_matrix_to_device(), 0, 0, hierarchy:get_size())
+        -- Get the extents of this hierarchy in the device space
+        local x2, y2, w2, h2 = matrix.transform_rectangle(hierarchy:get_matrix_to_device(),
+                0, 0, width, height)
         table.insert(result, {
             widget = hierarchy:get_widget(),
-            x = x, y = y, width = w, h = height,
+            x = x2, y = y2, width = w2, height = h2,
             drawable = drawable
         })
     end
-    for _, child in ipairs(hierarchy:get_children_at(x1, y1)) do
-        find_widgets(drawable, result, child, x1, y1)
+    for _, child in ipairs(hierarchy:get_children()) do
+        find_widgets(drawable, result, child, x, y)
     end
 end
 
@@ -294,6 +307,7 @@ function drawable.new(d, widget_arg)
     local ret = object()
     ret.drawable = d
     ret.widget_arg = widget_arg or ret
+    ret._need_complete_repaint = true
     ret._need_relayout = true
     ret._dirty_area = cairo.Region.create()
     setup_signals(ret)
@@ -319,7 +333,7 @@ function drawable.new(d, widget_arg)
         end
     end
     ret._do_complete_repaint = function()
-        ret._widget_hierarchy = nil
+        ret._need_complete_repaint = true
         ret:draw()
     end
     drawables[ret._do_complete_repaint] = true
