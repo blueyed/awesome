@@ -47,6 +47,10 @@ end
 --- Set the widget that this layout mirrors.
 -- @param widget The widget to mirror
 function mirror:set_widget(widget)
+    if self.widget == widget then
+        print(debug.traceback())
+        return
+    end
     if widget then
         base.check_widget(widget)
     end
@@ -68,12 +72,18 @@ function mirror:set_reflection(reflection)
         error("Invalid type of reflection for mirror layout: " ..
               type(reflection) .. " (should be a table)")
     end
+    local changed = false
     for _, ref in ipairs({"horizontal", "vertical"}) do
         if reflection[ref] ~= nil then
+            changed = changed or self[ref] ~= reflection[ref]
             self[ref] = reflection[ref]
         end
     end
-    self:emit_signal("widget::layout_changed")
+    if changed then
+        self:emit_signal("widget::layout_changed")
+    else
+        print(io.traceback())
+    end
 end
 
 --- Get the reflection of this mirror layout.

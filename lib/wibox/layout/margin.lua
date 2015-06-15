@@ -60,6 +60,10 @@ end
 
 --- Set the widget that this layout adds a margin on.
 function margin:set_widget(widget)
+    if self.widget == widget then
+        print(debug.traceback())
+        return
+    end
     if widget then
         base.check_widget(widget)
     end
@@ -69,6 +73,10 @@ end
 
 --- Set all the margins to val.
 function margin:set_margins(val)
+    if self.left == val and self.right == val and self.top == val and self.bottom == val then
+        print(debug.traceback())
+        return
+    end
     self.left = val
     self.right = val
     self.top = val
@@ -78,7 +86,11 @@ end
 
 --- Set the margins color to color
 function margin:set_color(color)
-    self.color = color and gcolor(color)
+    local color = color and gcolor(color)
+    if self.color == color then
+        return
+    end
+    self.color = color
     self:emit_signal("widget::redraw_needed")
 end
 
@@ -117,6 +129,10 @@ end
 -- Create setters for each direction
 for k, v in pairs({ "left", "right", "top", "bottom" }) do
     margin["set_" .. v] = function(layout, val)
+        if layout[v] == val then
+            print(debug.traceback())
+            return
+        end
         layout[v] = val
         layout:emit_signal("widget::layout_changed")
     end

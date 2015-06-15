@@ -135,18 +135,30 @@ end
 
 --- Set the layout's first widget. This is the widget that is at the left/top
 function align:set_first(widget)
+    if self.first == widget then
+        print(debug.traceback())
+        return
+    end
     self.first = widget
     self:emit_signal("widget::layout_changed")
 end
 
 --- Set the layout's second widget. This is the centered one.
 function align:set_second(widget)
+    if self.second == widget then
+        print(debug.traceback())
+        return
+    end
     self.second = widget
     self:emit_signal("widget::layout_changed")
 end
 
 --- Set the layout's third widget. This is the widget that is at the right/bottom
 function align:set_third(widget)
+    if self.third == widget then
+        print(debug.traceback())
+        return
+    end
     self.third = widget
     self:emit_signal("widget::layout_changed")
 end
@@ -190,11 +202,13 @@ end
 --              widget gets priority.
 -- @param mode How to use unused space. "inside" (default) "outside" or "none"
 function align:set_expand(mode)
-    if mode == "none" or mode == "outside" then
-        self._expand = mode
-    else
-        self._expand = "inside"
+    if mode ~= "none" and mode ~= "outside" then
+        mode = "inside"
     end
+    if self._expand == mode then
+        return
+    end
+    self._expand = mode
     self:emit_signal("widget::layout_changed")
 end
 

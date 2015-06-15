@@ -105,8 +105,12 @@ end
 -- widget will get all the space that is left. If this is false, the last widget
 -- won't be handled specially and there can be space left unused.
 function fixed:fill_space(val)
-    self._fill_space = val
-    self:emit_signal("widget::layout_changed")
+    if self._fill_space ~= val then
+        self._fill_space = val
+        self:emit_signal("widget::layout_changed")
+    else
+        print(debug.traceback())
+    end
 end
 
 local function get_layout(dir)
@@ -141,8 +145,12 @@ end
 --- Add spacing between each layout widgets
 -- @param spacing Spacing between widgets.
 function fixed:set_spacing(spacing)
-    self._spacing = spacing
-    self:emit_signal("widget::updated")
+    if self._spacing ~= spacing then
+        self._spacing = spacing
+        self:emit_signal("widget::updated")
+    else
+        print(debug.traceback())
+    end
 end
 
 return fixed

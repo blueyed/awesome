@@ -62,6 +62,9 @@ function textbox:set_markup(text)
     -- In case of error, attr is false and parsed is an error message
     if not attr then error(parsed) end
 
+    -- FIXME: How can we check if a redraw is really necessary and skip the
+    -- relayout and redraw if not?
+
     self._layout.text = parsed
     self._layout.attributes = attr
     self:emit_signal("widget::redraw_needed")
@@ -71,6 +74,9 @@ end
 --- Set a textbox' text.
 -- @param text The text to display. Pango markup is ignored and shown as-is.
 function textbox:set_text(text)
+    if self._layout.text == text and self._layout.attributes == nil then
+        return
+    end
     self._layout.text = text
     self._layout.attributes = nil
     self:emit_signal("widget::redraw_needed")
@@ -82,6 +88,10 @@ end
 function textbox:set_ellipsize(mode)
     local allowed = { none = "NONE", start = "START", middle = "MIDDLE", ["end"] = "END" }
     if allowed[mode] then
+        if self._layout:get_ellipsize() == allowed[mode] then
+            print(debug.traceback())
+            return
+        end
         self._layout:set_ellipsize(allowed[mode])
         self:emit_signal("widget::redraw_needed")
         self:emit_signal("widget::layout_changed")
@@ -93,6 +103,10 @@ end
 function textbox:set_wrap(mode)
     local allowed = { word = "WORD", char = "CHAR", word_char = "WORD_CHAR" }
     if allowed[mode] then
+        if self._layout:get_wrap() == allowed[mode] then
+            print(debug.traceback())
+            return
+        end
         self._layout:set_wrap(allowed[mode])
         self:emit_signal("widget::redraw_needed")
         self:emit_signal("widget::layout_changed")
@@ -104,6 +118,10 @@ end
 function textbox:set_valign(mode)
     local allowed = { top = true, center = true, bottom = true }
     if allowed[mode] then
+        if self._valign == mode then
+            print(debug.traceback())
+            return
+        end
         self._valign = mode
         self:emit_signal("widget::redraw_needed")
         self:emit_signal("widget::layout_changed")
@@ -115,6 +133,9 @@ end
 function textbox:set_align(mode)
     local allowed = { left = "LEFT", center = "CENTER", right = "RIGHT" }
     if allowed[mode] then
+        if self._layout:get_alignment() == allowed[mode] then
+            return
+        end
         self._layout:set_alignment(allowed[mode])
         self:emit_signal("widget::redraw_needed")
         self:emit_signal("widget::layout_changed")

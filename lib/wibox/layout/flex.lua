@@ -102,15 +102,23 @@ end
 -- maximum width for horizontal and maximum height for vertical).
 -- @param val The maximum size of the widget.
 function flex:set_max_widget_size(val)
-    self._max_widget_size = val
-    self:emit_signal("widget::layout_changed")
+    if self._max_widget_size ~= val then
+        self._max_widget_size = val
+        self:emit_signal("widget::layout_changed")
+    else
+        print(debug.traceback())
+    end
 end
 
 --- Add spacing between each layout widgets
 -- @param spacing Spacing between widgets.
 function flex:set_spacing(spacing)
-    self._spacing = spacing
-    self:emit_signal("widget::layout_changed")
+    if self._spacing ~= spacing then
+        self._spacing = spacing
+        self:emit_signal("widget::layout_changed")
+    else
+        print(debug.traceback())
+    end
 end
 
 function flex:reset()

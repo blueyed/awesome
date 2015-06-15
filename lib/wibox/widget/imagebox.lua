@@ -95,10 +95,17 @@ function imagebox:set_image(image)
         end
     end
 
+    if self._image == image then
+        return true
+    end
+    local old = self._image
     self._image = image
 
     self:emit_signal("widget::redraw_needed")
-    self:emit_signal("widget::layout_changed")
+    if not self.resize_forbidden and (not old or
+            old:get_width() ~= image:get_width() or old:get_height() ~= image:get_height()) then
+        self:emit_signal("widget::layout_changed")
+    end
     return true
 end
 
@@ -106,6 +113,10 @@ end
 -- @param allowed If false, the image will be clipped, else it will be resized
 --                to fit into the available space.
 function imagebox:set_resize(allowed)
+    if self.resize_forbidding == not allowed then
+        print(debug.traceback())
+        return
+    end
     self.resize_forbidden = not allowed
     self:emit_signal("widget::redraw_needed")
     self:emit_signal("widget::layout_changed")

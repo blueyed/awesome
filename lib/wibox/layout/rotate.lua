@@ -57,6 +57,10 @@ end
 
 --- Set the widget that this layout rotates.
 function rotate:set_widget(widget)
+    if self.widget == widget then
+        print(io.traceback())
+        return
+    end
     if widget then
         base.check_widget(widget)
     end
@@ -84,8 +88,12 @@ function rotate:set_direction(dir)
         error("Invalid direction for rotate layout: " .. tostring(dir))
     end
 
-    self.direction = dir
-    self:emit_signal("widget::layout_changed")
+    if self.direction ~= dir then
+        self.direction = dir
+        self:emit_signal("widget::layout_changed")
+    else
+        print(io.traceback())
+    end
 end
 
 --- Get the direction of this rotating layout

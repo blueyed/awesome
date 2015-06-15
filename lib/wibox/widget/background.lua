@@ -58,6 +58,9 @@ end
 
 --- Set the widget that is drawn on top of the background
 function background:set_widget(widget)
+    if widget == self.widget then
+        return
+    end
     if widget then
         base.check_widget(widget)
     end
@@ -67,27 +70,31 @@ end
 
 --- Set the background to use
 function background:set_bg(bg)
-    if bg then
-        self.background = color(bg)
-    else
-        self.background = nil
+    local bg = bg and color(bg)
+    if bg == self.background then
+        return
     end
+    self.background = bg
     self:emit_signal("widget::redraw_needed")
 end
 
 --- Set the foreground to use
 function background:set_fg(fg)
-    if fg then
-        self.foreground = color(fg)
-    else
-        self.foreground = nil
+    local fg = fg and color(fg)
+    if fg == self.foreground then
+        return
     end
+    self.foreground = fg
     self:emit_signal("widget::redraw_needed")
 end
 
 --- Set the background image to use
 function background:set_bgimage(image)
-    self.bgimage = surface.load(image)
+    local image = image and surface.load(image)
+    if self.bgimage == image then
+        return
+    end
+    self.bgimage = image
     self:emit_signal("widget::redraw_needed")
 end
 
