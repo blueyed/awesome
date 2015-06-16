@@ -73,6 +73,15 @@ function hierarchy:get_parent()
     return self._parent
 end
 
+--- Get the root of this widget hierarchy.
+function hierarchy:get_root()
+    local parent = self
+    while parent._parent do
+        parent = parent._parent
+    end
+    return parent
+end
+
 --- Get the widget that this hierarchy manages.
 function hierarchy:get_widget()
     return self._widget
