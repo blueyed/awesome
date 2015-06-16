@@ -27,6 +27,8 @@ local base = require("wibox.widget.base")
 local drawables = setmetatable({}, { __mode = 'k' })
 local wallpaper = nil
 
+drawable.visible_redraws = true
+
 local draw_hierarchy
 draw_hierarchy = function(arg, cr, hierarchy, dirty_area)
     local widget = hierarchy:get_widget()
@@ -106,10 +108,12 @@ local function do_redraw(self)
     cr:clip()
 
     -- XXX: Make redraws visible
-    cr:paint()
-    self.drawable:refresh()
-    local unused = mouse.object_under_pointer()
-    os.execute("sleep 0.5")
+    if drawable.visible_redraws then
+        cr:paint()
+        self.drawable:refresh()
+        local unused = mouse.object_under_pointer()
+        os.execute("sleep 0.1")
+    end
 
     -- Draw the background
     cr:save()
