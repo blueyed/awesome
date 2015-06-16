@@ -190,12 +190,11 @@ function base.make_widget(proxy)
         h = math.max(0, math.min(height, h))
         return w, h
     end
-    local function clear_cache()
+    ret._clear_widget_fit_layout_cache = function()
         ret._fit_geometry_cache = cache.new(fit_cb)
         ret._layout_cache = cache.new(layout_cb)
     end
-    clear_cache()
-    ret:connect_signal("widget::layout_changed", clear_cache)
+    ret._clear_widget_fit_layout_cache()
 
     return ret
 end
