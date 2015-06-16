@@ -166,6 +166,76 @@ mytasklist.buttons = awful.util.table.join(
                                               awful.client.focus.byidx(-1)
                                           end))
 
+-- Make this animation-stuff actually work
+wibox.drawable.visible_redraws = false
+
+-- Arguments: Widget to animate, time that one iteration needs, target scale,
+-- fps that we should try to hit
+function animation(child_widget, time, scale, fps)
+    local time = (time or 5) * 1000000
+    local scale = scale or 2
+    local fps = fps or 60
+
+    local Matrix = require("lgi").cairo.Matrix
+    local glib = require("lgi").GLib
+    local widget = wibox.widget.base.make_widget(child_widget)
+    local start = glib.get_monotonic_time()
+    local last_print = 0
+    local draws = 0
+
+    -- Calculate the current situation of the animation based on the current time
+    local function get_animation_stage()
+        local now = glib.get_monotonic_time()
+        local duration = (now - start) % (2 * time) / time
+        if duration > 1 then
+            -- Animation is "shrinking" again
+            duration = 2 - duration
+        end
+        return duration
+    end
+
+    -- Redirect children to an off-screen surface
+    widget.before_draw_children = function(_, _, cr, width, height)
+        cr:push_group()
+        draws = draws + 1
+    end
+    -- Paint children and apply an alpha to them
+    widget.after_draw_children = function(_, _, cr, width, height)
+        cr:pop_group_to_source()
+        cr:paint_with_alpha(1 - get_animation_stage())
+    end
+    -- Our child is placed so that it larger than this widget itself!
+    widget.layout = function(_, width, height)
+        -- Get the squared stage for better looking animation
+        local stage = get_animation_stage()
+        stage = stage * stage
+        -- Turn this into a number in [1, scale]
+        local factor = stage * scale + (1 - stage)
+        -- Calculate a suitable cairo matrix that places the child so that the
+        -- animation scaled from the center of this widget
+        local m = Matrix.create_translate(width / 2, height / 2)
+        m:scale(factor, factor)
+        m:translate(-factor * width / 2, -factor * height / 2)
+        -- Actually place the widget
+        return { wibox.widget.base.place_widget_via_matrix(child_widget, m, width * factor, height * factor) }
+    end
+
+    -- Start a timer that forces a redraw 'fps' times per second (and print our
+    -- actual number of fps once per second)
+    local t = timer({ timeout = 1/fps })
+    t:connect_signal("timeout", function()
+        widget:emit_signal("widget::layout_changed")
+        local now = os.time()
+        if last_print ~= now then
+            print(draws .. " fps")
+            last_print = now
+            draws = 0
+        end
+    end)
+    t:start()
+    return widget
+end
+
 for s = 1, screen.count() do
     -- Create a promptbox for each screen
     mypromptbox[s] = awful.widget.prompt()
@@ -191,6 +261,7 @@ for s = 1, screen.count() do
     left_layout:add(mylauncher)
     left_layout:add(mytaglist[s])
     left_layout:add(mypromptbox[s])
+    left_layout:add(animation(mylauncher))
 
     -- Widgets that are aligned to the right
     local right_layout = wibox.layout.fixed.horizontal()
