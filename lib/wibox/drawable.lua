@@ -369,18 +369,22 @@ function drawable.new(d, widget_arg)
 
     -- Set up our callbacks for repaints
     ret._redraw_callback = function(hierarchy)
-        local m = hierarchy:get_matrix_to_device()
-        local x, y, width, height = matrix.transform_rectangle(m, hierarchy:get_draw_extents())
-        local x1, y1 = math.floor(x), math.floor(y)
-        local x2, y2 = math.ceil(x + width), math.ceil(y + height)
-        ret._dirty_area:union_rectangle(cairo.RectangleInt({
-            x = x1, y = y1, width = x2 - x1, height = y2 - y1
-        }))
-        ret:draw()
+        if hierarchy:get_root() == ret._widget_hierarchy then
+            local m = hierarchy:get_matrix_to_device()
+            local x, y, width, height = matrix.transform_rectangle(m, hierarchy:get_draw_extents())
+            local x1, y1 = math.floor(x), math.floor(y)
+            local x2, y2 = math.ceil(x + width), math.ceil(y + height)
+            ret._dirty_area:union_rectangle(cairo.RectangleInt({
+                x = x1, y = y1, width = x2 - x1, height = y2 - y1
+            }))
+            ret:draw()
+        end
     end
     ret._layout_callback = function(hierarchy)
-        ret._need_relayout = true
-        ret:draw()
+        if hierarchy:get_root() == ret._widget_hierarchy then
+            ret._need_relayout = true
+            ret:draw()
+        end
     end
 
     -- Make sure the drawable is drawn at least once
