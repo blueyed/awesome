@@ -58,13 +58,15 @@ end
 --   `<b>bold</b>`). You can use awful.util.escape to escape
 --   parts of it.
 function textbox:set_markup(text)
+    if self._markup == text then
+        return
+    end
+
     local attr, parsed = Pango.parse_markup(text, -1, 0)
     -- In case of error, attr is false and parsed is an error message
     if not attr then error(parsed) end
 
-    -- FIXME: How can we check if a redraw is really necessary and skip the
-    -- relayout and redraw if not?
-
+    self._markup = text
     self._layout.text = parsed
     self._layout.attributes = attr
     self:emit_signal("widget::redraw_needed")
@@ -77,6 +79,7 @@ function textbox:set_text(text)
     if self._layout.text == text and self._layout.attributes == nil then
         return
     end
+    self._markup = nil
     self._layout.text = text
     self._layout.attributes = nil
     self:emit_signal("widget::redraw_needed")
