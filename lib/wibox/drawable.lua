@@ -197,9 +197,6 @@ end
 --- Set the widget that the drawable displays
 function drawable:set_widget(widget)
     self.widget = widget
-    if widget then
-        widget:weak_connect_signal("widget::updated", self.draw)
-    end
 
     -- Make sure the widget gets drawn
     self._need_relayout = true
