@@ -136,7 +136,6 @@ end
 --- Set the layout's first widget. This is the widget that is at the left/top
 function align:set_first(widget)
     if self.first == widget then
-        print(debug.traceback())
         return
     end
     self.first = widget
@@ -146,7 +145,6 @@ end
 --- Set the layout's second widget. This is the centered one.
 function align:set_second(widget)
     if self.second == widget then
-        print(debug.traceback())
         return
     end
     self.second = widget
@@ -156,7 +154,6 @@ end
 --- Set the layout's third widget. This is the widget that is at the right/bottom
 function align:set_third(widget)
     if self.third == widget then
-        print(debug.traceback())
         return
     end
     self.third = widget
