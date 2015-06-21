@@ -147,7 +147,7 @@ end
 function fixed:set_spacing(spacing)
     if self._spacing ~= spacing then
         self._spacing = spacing
-        self:emit_signal("widget::updated")
+        self:emit_signal("widget::layout_changed")
     else
         print(debug.traceback())
     end
