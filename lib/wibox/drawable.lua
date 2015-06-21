@@ -41,9 +41,14 @@ draw_hierarchy = function(arg, cr, hierarchy, dirty_area)
     -- Are we outside of the dirty area?
     local rect = cairo.RectangleInt{ x = x, y = y, width = width, height = height }
     if dirty_area:contains_rectangle(rect) ~= "OUT" then
-        local call = function(func)
+        local call = function(func, extra_arg)
             if func then
-                local success, msg = pcall(func, widget, arg, cr, hierarchy:get_size())
+                local success, msg
+                if not extra_arg then
+                    success, msg = pcall(func, widget, arg, cr, hierarchy:get_size())
+                else
+                    success, msg = pcall(func, widget, extra_arg, arg, cr, hierarchy:get_size())
+                end
                 if not success then
                     print("Error while drawing widget: " .. msg)
                 end
@@ -62,7 +67,9 @@ draw_hierarchy = function(arg, cr, hierarchy, dirty_area)
         cr:clip()
         call(widget.before_draw_children)
         for _, wi in ipairs(hierarchy:get_children()) do
+            call(widget.before_draw_child, wi:get_widget())
             draw_hierarchy(arg, cr, wi, dirty_area)
+            call(widget.after_draw_child, wi:get_widget())
         end
         call(widget.after_draw_children)
     end
