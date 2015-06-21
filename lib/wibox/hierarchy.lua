@@ -65,7 +65,13 @@ function hierarchy.new(widget, width, height, redraw_callback, layout_callback)
         width = draws_x2 - draws_x1,
         height = draws_y2 - draws_y1
     }
-    return setmetatable(result, { __index = hierarchy })
+
+    for k, f in pairs(hierarchy) do
+        if type(f) == "function" then
+            result[k] = f
+        end
+    end
+    return result
 end
 
 --- Get the parent hierarchy of this widget hierarchy (or nil).
