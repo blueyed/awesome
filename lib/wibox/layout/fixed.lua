@@ -16,7 +16,7 @@ local fixed = {}
 -- @param height The available height.
 function fixed:layout(width, height)
     local result = {}
-    local pos,spacing = 0,self._spacing or 0
+    local pos,spacing = 0, self._spacing
 
     for k, v in pairs(self.widgets) do
         local x, y, w, h, _
@@ -87,7 +87,7 @@ function fixed:fit(orig_width, orig_height)
         end
     end
 
-    local spacing = ((self._spacing or 0)*(#self.widgets-1))
+    local spacing = self._spacing * (#self.widgets-1)
 
     if self.dir == "y" then
         return used_max, used_in_dir + spacing
@@ -106,10 +106,8 @@ end
 -- won't be handled specially and there can be space left unused.
 function fixed:fill_space(val)
     if self._fill_space ~= val then
-        self._fill_space = val
+        self._fill_space = not not val
         self:emit_signal("widget::layout_changed")
-    else
-        print(debug.traceback())
     end
 end
 
@@ -124,6 +122,8 @@ local function get_layout(dir)
 
     ret.dir = dir
     ret.widgets = {}
+    ret:set_spacing(0)
+    ret:fill_space(false)
 
     return ret
 end
@@ -148,8 +148,6 @@ function fixed:set_spacing(spacing)
     if self._spacing ~= spacing then
         self._spacing = spacing
         self:emit_signal("widget::layout_changed")
-    else
-        print(debug.traceback())
     end
 end
 
