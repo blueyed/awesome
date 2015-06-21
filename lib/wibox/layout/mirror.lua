@@ -48,7 +48,6 @@ end
 -- @param widget The widget to mirror
 function mirror:set_widget(widget)
     if self.widget == widget then
-        print(debug.traceback())
         return
     end
     if widget then
@@ -81,8 +80,6 @@ function mirror:set_reflection(reflection)
     end
     if changed then
         self:emit_signal("widget::layout_changed")
-    else
-        print(io.traceback())
     end
 end
 

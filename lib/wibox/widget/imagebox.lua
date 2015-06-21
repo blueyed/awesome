@@ -114,7 +114,6 @@ end
 --                to fit into the available space.
 function imagebox:set_resize(allowed)
     if self.resize_forbidding == not allowed then
-        print(debug.traceback())
         return
     end
     self.resize_forbidden = not allowed

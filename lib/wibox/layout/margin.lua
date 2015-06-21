@@ -61,7 +61,6 @@ end
 --- Set the widget that this layout adds a margin on.
 function margin:set_widget(widget)
     if self.widget == widget then
-        print(debug.traceback())
         return
     end
     if widget then
@@ -74,7 +73,6 @@ end
 --- Set all the margins to val.
 function margin:set_margins(val)
     if self.left == val and self.right == val and self.top == val and self.bottom == val then
-        print(debug.traceback())
         return
     end
     self.left = val
@@ -130,7 +128,6 @@ end
 for k, v in pairs({ "left", "right", "top", "bottom" }) do
     margin["set_" .. v] = function(layout, val)
         if layout[v] == val then
-            print(debug.traceback())
             return
         end
         layout[v] = val

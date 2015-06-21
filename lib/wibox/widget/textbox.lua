@@ -92,7 +92,6 @@ function textbox:set_ellipsize(mode)
     local allowed = { none = "NONE", start = "START", middle = "MIDDLE", ["end"] = "END" }
     if allowed[mode] then
         if self._layout:get_ellipsize() == allowed[mode] then
-            print(debug.traceback())
             return
         end
         self._layout:set_ellipsize(allowed[mode])
@@ -107,7 +106,6 @@ function textbox:set_wrap(mode)
     local allowed = { word = "WORD", char = "CHAR", word_char = "WORD_CHAR" }
     if allowed[mode] then
         if self._layout:get_wrap() == allowed[mode] then
-            print(debug.traceback())
             return
         end
         self._layout:set_wrap(allowed[mode])
@@ -122,7 +120,6 @@ function textbox:set_valign(mode)
     local allowed = { top = true, center = true, bottom = true }
     if allowed[mode] then
         if self._valign == mode then
-            print(debug.traceback())
             return
         end
         self._valign = mode
