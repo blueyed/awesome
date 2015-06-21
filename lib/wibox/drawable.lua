@@ -202,6 +202,7 @@ function drawable:set_widget(widget)
     end
 
     -- Make sure the widget gets drawn
+    self._need_relayout = true
     self.draw()
 end
 
