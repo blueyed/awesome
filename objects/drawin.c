@@ -177,33 +177,25 @@ static void
 drawin_moveresize(lua_State *L, int udx, area_t geometry)
 {
     drawin_t *w = luaA_checkudata(L, udx, &drawin_class);
+    area_t old_geometry = w->geometry;
 
-    if(w->geometry.x != geometry.x)
-    {
-        w->geometry.x = geometry.x;
-        luaA_object_emit_signal(L, udx, "property::x", 0);
-    }
-
-    if(w->geometry.y != geometry.y)
-    {
-        w->geometry.y = geometry.y;
-        luaA_object_emit_signal(L, udx, "property::y", 0);
-    }
-
-    if(geometry.width > 0 && w->geometry.width != geometry.width)
-    {
-        w->geometry.width = geometry.width;
-        luaA_object_emit_signal(L, udx, "property::width", 0);
-    }
-
-    if(geometry.height > 0 && w->geometry.height != geometry.height)
-    {
-        w->geometry.height = geometry.height;
-        luaA_object_emit_signal(L, udx, "property::height", 0);
-    }
+    w->geometry = geometry;
+    if(w->geometry.width <= 0)
+        w->geometry.width = old_geometry.width;
+    if(w->geometry.height <= 0)
+        w->geometry.height = old_geometry.height;
 
     w->geometry_dirty = true;
     drawin_update_drawing(L, udx);
+
+    if (old_geometry.x != w->geometry.x)
+        luaA_object_emit_signal(L, udx, "property::x", 0);
+    if (old_geometry.y != w->geometry.y)
+        luaA_object_emit_signal(L, udx, "property::y", 0);
+    if (old_geometry.width != w->geometry.width)
+        luaA_object_emit_signal(L, udx, "property::width", 0);
+    if (old_geometry.height != w->geometry.height)
+        luaA_object_emit_signal(L, udx, "property::height", 0);
 }
 
 /** Refresh the window content by copying its pixmap data to its window.
