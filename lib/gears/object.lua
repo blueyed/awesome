@@ -109,7 +109,7 @@ local function new()
 end
 
 function object.mt:__call(...)
-    return new(...)
+    return new()
 end
 
 --- Helper function to get the module name out of `debug.getinfo`.

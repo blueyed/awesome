@@ -21,7 +21,7 @@ local rtable = table
 local pairs = pairs
 local string = string
 local lgi = require("lgi")
-local Gio = require("lgi").Gio
+local Gio = lgi.Gio
 local Pango = lgi.Pango
 local capi =
 {
