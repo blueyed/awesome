@@ -100,8 +100,8 @@ NEW_REV="$(git rev-parse --short HEAD)"
 git push --quiet origin "$BRANCH"
 
 # Generate compare view links.
-COMPARE_LINKS="Compare view: https://github.com/awesomeWM/apidoc/compare/${OLD_REV}...${NEW_REV}
-Relevant changes: https://github.com/awesomeWM/apidoc/commit/${RELEVANT_REV}"
+COMPARE_LINKS="Compare view: https://github.com/awesomeWM/apidoc/compare/${OLD_REV}...${NEW_REV}"
+COMPARE_LINKS="$COMPARE_LINKS\nRelevant changes: https://github.com/awesomeWM/apidoc/commit/${RELEVANT_REV}"
 if [ "$BRANCH" != "gh-pages" ]; then
   COMPARE_LINKS="$COMPARE_LINKS\nComparison against master (gh-pages): https://github.com/awesomeWM/apidoc/compare/gh-pages...${NEW_REV}"
 fi
